@@ -1,22 +1,40 @@
+// Globals
 usage = "Usage: crack [user:password] or [password]"
 crypto = include_lib("crypto.so")
+// Lib check
 if not crypto then
   crypto = include_lib("/lib/crypto.so")
 else
   exit("Crypto.so could not be found.")
 end if
 
-password_list = []
-for i in params
-  if i.split(":").len() == 2 then
-    user = i.split(":")[0]
-    password = i.split(":")[1]
-  else if i.split(":").len() == 1 then
-    user = null
-    password = i.split(":")[0]
-  else
-    exit("<b>"+usage+"</b>")
-  end if
-  password_list = password_list+[{"user":user, "password":crypto.decipher(password)}]
-end for
-print(password_list)
+// Main
+main = function()
+  password_list = []
+  for i in params
+    if i.split(":").len() == 2 then
+      user = i.split(":")[0]
+      password = i.split(":")[1]
+
+    else if i.split(":").len() == 1 then
+      user = null
+      password = i.split(":")[0]
+
+    else
+      exit("<b>"+usage+"</b>")
+    end if
+
+    password_list = password_list+[{"user":user, "password":crypto.decipher(password)}]
+  end for
+
+  for i in password_list
+    if i["user"] then
+      print("Password: <color=green>"+i["user"]+":"+i["password"]+"</color>")
+
+    else
+      print("Password: <color=green>"+i["password"]+"</color>")
+    end if
+  end for
+end function
+
+main()
